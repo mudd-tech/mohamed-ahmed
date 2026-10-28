@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ميجاستور وبروجيكت واي | نظام التحصيلات والمصروفات</title>
+    <title>ميجاستور & بروجيكت واي | النظام المالي المتقدم</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- مكتبة تصدير PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -71,7 +71,7 @@
             overflow: hidden;
         }
 
-        /* شاشة القفل والأمان */
+        /* شاشة الأمان */
         #lockScreen {
             position: absolute;
             inset: 0;
@@ -138,10 +138,10 @@
             font-size: 14px;
         }
 
-        /* لوحة الملخص المالي */
+        /* لوحة المؤشرات المالية (مقسمة بدقة) */
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 16px;
         }
@@ -150,23 +150,24 @@
             background: var(--item-bg);
             border: 1px solid var(--item-border);
             border-radius: 14px;
-            padding: 10px 6px;
+            padding: 10px;
             text-align: center;
         }
 
         .summary-label {
-            font-size: 10px;
+            font-size: 10.5px;
             color: var(--text-muted);
             font-weight: 700;
             margin-bottom: 4px;
         }
 
         .summary-value {
-            font-size: 12.5px;
+            font-size: 13.5px;
             font-weight: 900;
         }
 
         .text-inc { color: var(--success); }
+        .text-vod { color: var(--vodafone); }
         .text-exp { color: var(--danger); }
         .text-net { color: var(--brand-gold); }
 
@@ -345,7 +346,7 @@
             text-align: center;
         }
 
-        /* تنسيق جدول الـ PDF */
+        /* تنسيق تقرير الـ PDF بفصل الإيرادات عن المصروفات */
         #pdfReportContainer {
             display: none;
         }
@@ -354,10 +355,10 @@
 <body>
 
     <div class="app-container">
-        <!-- شاشة الأمان وكلمة المرور -->
+        <!-- شاشة الأمان -->
         <div id="lockScreen">
-            <div class="lock-title">🔐 نظام الحماية المركزية</div>
-            <div class="lock-desc" id="lockDescText">أدخل كلمة المرور لفتح سجلات العمليات</div>
+            <div class="lock-title">🔐 النظام المالي المتقدم</div>
+            <div class="lock-desc">أدخل كلمة المرور (الافتراضية: 1234)</div>
             <div class="input-group" style="width: 100%;">
                 <input type="password" id="passInput" class="input-field" placeholder="كلمة المرور...">
             </div>
@@ -365,16 +366,16 @@
             <button class="submit-btn" onclick="verifyPassword()">دخول آمن</button>
         </div>
 
-        <!-- نافذة تغيير كلمة المرور -->
+        <!-- نافذة الإعدادات -->
         <div id="settingsModal">
             <div class="modal-card">
                 <div class="form-title" style="margin-bottom: 12px;">⚙️ تغيير كلمة المرور</div>
                 <div class="input-group">
                     <label>كلمة المرور الجديدة</label>
-                    <input type="password" id="newPassInput" class="input-field" placeholder="أدخل الباسورد الجديد...">
+                    <input type="password" id="newPassInput" class="input-field" placeholder="الباسورد الجديد...">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 12px;">
-                    <button class="submit-btn" onclick="updatePassword()">حفظ التغيير</button>
+                    <button class="submit-btn" onclick="updatePassword()">حفظ</button>
                     <button class="action-btn-custom" onclick="closeSettings()" style="margin-top: 4px;">إلغاء</button>
                 </div>
             </div>
@@ -384,35 +385,46 @@
         <header class="app-header">
             <div>
                 <div class="app-title">ميجاستور & بروجيكت واي</div>
-                <div class="app-sub">إدارة التحصيلات، الاشتراكات والمصروفات</div>
+                <div class="app-sub">المحصل: محمد أحمد علي</div>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="openSettings()" title="الإعدادات وكلمة المرور">⚙️</button>
-                <button class="icon-btn" onclick="toggleTheme()" title="تغيير المظهر">🌓</button>
-                <button class="icon-btn" onclick="lockApp()" title="قفل التطبيق">🔒</button>
+                <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
+                <button class="icon-btn" onclick="toggleTheme()" title="المظهر">🌓</button>
+                <button class="icon-btn" onclick="lockApp()" title="قفل">🔒</button>
             </div>
         </header>
 
-        <!-- ملخص الحسابات -->
+        <!-- لوحة الملخص المالي المنفصل -->
         <div class="summary-grid">
             <div class="summary-card">
-                <div class="summary-label">إجمالي التحصيلات</div>
-                <div class="summary-value text-inc" id="totalInc">0 ج.م</div>
+                <div class="summary-label">تحصيلات كاش</div>
+                <div class="summary-value text-inc" id="totalCash">0 ج.م</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">فودافون كاش</div>
+                <div class="summary-value text-vod" id="totalVod">0 ج.م</div>
             </div>
             <div class="summary-card">
                 <div class="summary-label">إجمالي المصروفات</div>
                 <div class="summary-value text-exp" id="totalExp">0 ج.م</div>
             </div>
             <div class="summary-card">
-                <div class="summary-label">صافي الخزينة</div>
+                <div class="summary-label">صافي الخزينة العام</div>
                 <div class="summary-value text-net" id="netBalance">0 ج.م</div>
             </div>
         </div>
 
-        <!-- نموذج إضافة حركة جديدة -->
+        <!-- نموذج الإدخال -->
         <div class="form-card">
-            <div class="form-title">➕ تسجيل معاملة مالية جديدة</div>
+            <div class="form-title">➕ تسجيل معاملة جديدة (محمد أحمد علي)</div>
             <form id="transForm" onsubmit="addTransaction(event)">
+                <div class="input-group">
+                    <label>اختر الفرع</label>
+                    <select id="branch" class="input-field">
+                        <option value="فرع سيدي جابر">فرع سيدي جابر</option>
+                        <option value="فرع كفر الدوار">فرع كفر الدوار</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <label>اختر البرنامج</label>
                     <select id="program" class="input-field">
@@ -428,85 +440,111 @@
                     </select>
                 </div>
                 <div class="input-group" id="subTypeGroup">
-                    <label>نوع التحصيل / الاشتراك</label>
+                    <label>طريقة التحصيل / نوع الاشتراك</label>
                     <select id="subType" class="input-field">
-                        <option value="نسخة جديدة">تحصيل نسخة جديدة</option>
+                        <option value="تحصيل نقدي (كاش)">تحصيل نقدي (كاش)</option>
+                        <option value="فودافون كاش">تحصيل فودافون كاش</option>
+                        <option value="تحصيل نسخة جديدة">تحصيل نسخة جديدة</option>
                         <option value="دعم فني متعدد">اشتراك الدعم الفني المتعدد</option>
                         <option value="نسخة احتياطية">اشتراك النسخة الاحتياطية</option>
                         <option value="اشتراك أونلاين">اشتراك أونلاين</option>
                         <option value="زيارة دعم فني">زيارة دعم فني</option>
-                        <option value="فودافون كاش">تحصيل عبر فودافون كاش</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label id="nameLabel">اسم النسخة / جهة الصرف</label>
+                    <label id="nameLabel">اسم النسخة / جهة التحصيل</label>
                     <input type="text" id="versionName" class="input-field" required placeholder="مثال: POS v5 / فاتورة صيانة">
                 </div>
                 <div class="input-group" id="addressGroup">
                     <label>عنوان / فرع العميل</label>
-                    <input type="text" id="clientAddress" class="input-field" placeholder="مثال: الإسكندرية - سموحة">
+                    <input type="text" id="clientAddress" class="input-field" placeholder="مثال: سموحة - شارع الإقبال">
                 </div>
                 <div class="input-group">
                     <label>المبلغ (ج.م)</label>
                     <input type="number" id="amount" class="input-field" step="0.01" required placeholder="0.00">
                 </div>
-                <button type="submit" class="submit-btn">حفظ المعاملة المالية</button>
+                <button type="submit" class="submit-btn">حفظ المعاملة</button>
             </form>
         </div>
 
         <!-- أزرار التقارير والتصدير -->
         <div class="action-row">
-            <button class="action-btn-custom" onclick="exportPDF()">📄 تصدير تقرير PDF جدول</button>
+            <button class="action-btn-custom" onclick="exportPDF()">📄 تصدير تقرير PDF منظم</button>
             <button class="action-btn-custom" onclick="clearData()" style="color: var(--danger);">🗑️ مسح الكل</button>
         </div>
 
-        <!-- قائمة أحدث المعاملات -->
+        <!-- قائمة الحركات -->
         <div style="font-size: 11.5px; font-weight: 800; color: var(--brand-gold); margin-bottom: 6px;">سجل الحركات الأخيرة:</div>
         <div class="transactions-section" id="transList">
             <!-- تُعبأ برمجياً -->
         </div>
 
         <footer class="footer-credit">
-            MegaStore & Project Y | Secured by <span>Tapio</span>
+            المحصل: محمد أحمد  | Secured by <span>Tapio</span>
         </footer>
     </div>
 
-    <!-- قالب مخفي للـ PDF -->
+    <!-- قالب الـ PDF المنظم (جداول منفصلة للإيرادات والمصروفات) -->
     <div id="pdfReportContainer">
         <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px; color: #111;">
-            <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">تقرير التحصيلات والمصروفات المالي</h2>
-            <p style="text-align: center; font-size: 11px; color: #666; margin-bottom: 15px;" id="reportDate">تاريخ التقرير: </p>
+            <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">تقرير الحسابات المالي والتحصيلات</h2>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 20px; border-bottom: 2px solid #23400D; padding-bottom: 8px;">
+                <span>المحصل المسؤول: <b>محمد أحمد </b></span>
+                <span id="reportDate">تاريخ التقرير: </span>
+            </div>
             
+            <!-- جدول الإيرادات والتحصيلات -->
+            <h3 style="color: #16a34a; font-size: 14px; margin-bottom: 6px;">أولاً: الإيرادات وتحصيلات الاشتراكات</h3>
             <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
                 <thead>
                     <tr style="background-color: #23400D; color: #fff;">
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">م</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">البرنامج</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">النوع والتفاصيل</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">البيان / النسخة</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">العنوان</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">المبلغ</th>
-                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">التاريخ والوقت</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">م</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الفرع</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">البرنامج</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الطريقة / البند</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">النسخة / البيان</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">العنوان</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">المبلغ</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
                     </tr>
                 </thead>
-                <tbody id="pdfTableBody">
-                    <!-- تُعبأ برمجياً للطباعة -->
+                <tbody id="pdfIncomeBody">
+                    <!-- تُعبأ برمجياً -->
                 </tbody>
             </table>
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px;" id="pdfSummaryTotals">
-                <!-- إجماليات الـ PDF -->
+
+            <!-- جدول المصروفات -->
+            <h3 style="color: #dc2626; font-size: 14px; margin-bottom: 6px; margin-top: 20px;">ثانياً: المصروفات المنصرفة</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background-color: #7f1d1d; color: #fff;">
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">م</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الفرع</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">البرنامج</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">بيان المصروف</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">المبلغ</th>
+                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfExpenseBody">
+                    <!-- تُعبأ برمجياً -->
+                </tbody>
+            </table>
+
+            <!-- الملخص النهائي للـ PDF -->
+            <div style="margin-top: 25px; border-top: 2px solid #23400D; padding-top: 10px; font-weight: bold; font-size: 12px; display: flex; flex-direction: column; gap: 4px;" id="pdfSummaryTotals">
+                <!-- الإجماليات -->
             </div>
         </div>
     </div>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('combined_transactions')) || [];
+        let transactions = JSON.parse(localStorage.getItem('muhammad_transactions')) || [];
         let currentPassword = localStorage.getItem('app_password') || '1234';
 
         function verifyPassword() {
             const inputVal = document.getElementById('passInput').value;
             const errorEl = document.getElementById('errorMsg');
-            
             if(inputVal === currentPassword) {
                 document.getElementById('lockScreen').style.display = 'none';
                 errorEl.style.display = 'none';
@@ -571,6 +609,7 @@
 
         function addTransaction(e) {
             e.preventDefault();
+            const branch = document.getElementById('branch').value;
             const program = document.getElementById('program').value;
             const type = document.getElementById('type').value;
             const subType = type === 'inc' ? document.getElementById('subType').value : 'مصروفات';
@@ -579,7 +618,7 @@
             const amount = parseFloat(document.getElementById('amount').value);
             const date = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            const newT = { id: Date.now(), program, type, subType, versionName, clientAddress, amount, date };
+            const newT = { id: Date.now(), branch, program, type, subType, versionName, clientAddress, amount, date };
             transactions.unshift(newT);
             saveAndRender();
             document.getElementById('transForm').reset();
@@ -594,98 +633,19 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('combined_transactions', JSON.stringify(transactions));
+            localStorage.setItem('muhammad_transactions', JSON.stringify(transactions));
             renderUI();
         }
 
         function renderUI() {
-            let totalInc = 0, totalExp = 0;
+            let totalCash = 0, totalVod = 0, totalExp = 0;
             const listEl = document.getElementById('transList');
-            const pdfBody = document.getElementById('pdfTableBody');
+            const pdfIncBody = document.getElementById('pdfIncomeBody');
+            const pdfExpBody = document.getElementById('pdfExpenseBody');
+            
             listEl.innerHTML = '';
-            pdfBody.innerHTML = '';
+            pdfIncBody.innerHTML = '';
+            pdfExpBody.innerHTML = '';
 
             if(transactions.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px; color:var(--text-muted); padding:15px;">لا توجد معاملات مسجلة حتى الآن</div>';
-                pdfBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">لا توجد بيانات</td></tr>';
-            }
-
-            transactions.forEach((t, index) => {
-                if(t.type === 'inc') totalInc += t.amount;
-                else totalExp += t.amount;
-
-                // عرض التطبيق
-                const item = document.createElement('div');
-                item.className = 'transaction-item';
-                item.innerHTML = `
-                    <div class="t-info">
-                        <h4>[${t.program}] ${t.versionName}</h4>
-                        <p>${t.type === 'inc' ? '🏷️ ' + t.subType + ' | 📍 ' + t.clientAddress : '💸 مصروفات نقدية'}</p>
-                        <span>🕒 ${t.date}</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span class="t-amount" style="color: ${t.type === 'inc' ? 'var(--success)' : 'var(--danger)'};">
-                            ${t.type === 'inc' ? '+' : '-'}${t.amount.toLocaleString()} ج.م
-                        </span>
-                        <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
-                    </div>
-                `;
-                listEl.appendChild(item);
-
-                // تجهيز صف الجدول للـ PDF
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="border: 1px solid #ddd; padding: 5px;">${index + 1}</td>
-                    <td style="border: 1px solid #ddd; padding: 5px; font-weight:bold;">${t.program}</td>
-                    <td style="border: 1px solid #ddd; padding: 5px;">${t.subType}</td>
-                    <td style="border: 1px solid #ddd; padding: 5px;">${t.versionName}</td>
-                    <td style="border: 1px solid #ddd; padding: 5px;">${t.clientAddress}</td>
-                    <td style="border: 1px solid #ddd; padding: 5px; color:${t.type==='inc'?'green':'red'};">${t.type==='inc'?'+':'-'}${t.amount.toLocaleString()} ج.م</td>
-                    <td style="border: 1px solid #ddd; padding: 5px;">${t.date}</td>
-                `;
-                pdfBody.appendChild(row);
-            });
-
-            document.getElementById('totalInc').innerText = totalInc.toLocaleString() + ' ج.م';
-            document.getElementById('totalExp').innerText = totalExp.toLocaleString() + ' ج.م';
-            const net = totalInc - totalExp;
-            const netEl = document.getElementById('netBalance');
-            netEl.innerText = net.toLocaleString() + ' ج.م';
-            netEl.className = `summary-value ${net >= 0 ? 'text-inc' : 'text-exp'}`;
-
-            document.getElementById('pdfSummaryTotals').innerHTML = `
-                <span>إجمالي الإيرادات: ${totalInc.toLocaleString()} ج.م</span>
-                <span>إجمالي المصروفات: ${totalExp.toLocaleString()} ج.م</span>
-                <span>الصافي: ${net.toLocaleString()} ج.م</span>
-            `;
-            document.getElementById('reportDate').innerText = `تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`;
-        }
-
-        function clearData() {
-            if(confirm('تحذير: سيتم مسح كافة السجلات نهائياً! هل أنت متأكد؟')) {
-                transactions = [];
-                saveAndRender();
-            }
-        }
-
-        function exportPDF() {
-            const element = document.getElementById('pdfReportContainer');
-            element.style.display = 'block';
-            
-            const opt = {
-                margin:       10,
-                filename:     'MegaStore_ProjectY_Report.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().from(element).set(opt).save().then(() => {
-                element.style.display = 'none';
-            });
-        }
-
-        renderUI();
-    </script>
-</body>
-</html>
+                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px;
