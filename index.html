@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ميجاستور | نظام تحصيلات النسخ والإيرادات</title>
+    <title>ميجاستور وبروجيكت واي | نظام التحصيلات والمصروفات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- مكتبة تصدير PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -60,7 +60,7 @@
 
         .app-container {
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
             background: var(--card-surface);
             backdrop-filter: blur(25px);
             border: 1px solid var(--card-border);
@@ -109,7 +109,7 @@
         }
 
         .app-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 900;
             color: var(--brand-gold);
         }
@@ -162,12 +162,12 @@
         }
 
         .summary-value {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 900;
         }
 
         .text-inc { color: var(--success); }
-        .text-vod { color: var(--vodafone); }
+        .text-exp { color: var(--danger); }
         .text-net { color: var(--brand-gold); }
 
         /* نموذج الإدخال */
@@ -323,7 +323,29 @@
             display: none;
         }
 
-        /* تنسيق مخصص عند تصدير الـ PDF ليظهر كجدول احترافي */
+        /* نافذة إعدادات تغيير كلمة المرور */
+        #settingsModal {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 11, 5, 0.9);
+            z-index: 90;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--card-surface);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        /* تنسيق جدول الـ PDF */
         #pdfReportContainer {
             display: none;
         }
@@ -334,22 +356,38 @@
     <div class="app-container">
         <!-- شاشة الأمان وكلمة المرور -->
         <div id="lockScreen">
-            <div class="lock-title">🔐 ميجاستور | بوابة التحصيلات</div>
-            <div class="lock-desc">أدخل كلمة المرور الافتتاحية (1234) لفتح السجلات</div>
+            <div class="lock-title">🔐 نظام الحماية المركزية</div>
+            <div class="lock-desc" id="lockDescText">أدخل كلمة المرور لفتح سجلات العمليات</div>
             <div class="input-group" style="width: 100%;">
-                <input type="password" id="passInput" class="input-field" placeholder="كلمة المرور (1234)...">
+                <input type="password" id="passInput" class="input-field" placeholder="كلمة المرور...">
             </div>
             <div id="errorMsg" class="error-msg">كلمة المرور غير صحيحة!</div>
             <button class="submit-btn" onclick="verifyPassword()">دخول آمن</button>
         </div>
 
+        <!-- نافذة تغيير كلمة المرور -->
+        <div id="settingsModal">
+            <div class="modal-card">
+                <div class="form-title" style="margin-bottom: 12px;">⚙️ تغيير كلمة المرور</div>
+                <div class="input-group">
+                    <label>كلمة المرور الجديدة</label>
+                    <input type="password" id="newPassInput" class="input-field" placeholder="أدخل الباسورد الجديد...">
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button class="submit-btn" onclick="updatePassword()">حفظ التغيير</button>
+                    <button class="action-btn-custom" onclick="closeSettings()" style="margin-top: 4px;">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
         <!-- رأس التطبيق -->
         <header class="app-header">
             <div>
-                <div class="app-title">ميجاستور | تحصينات النسخ</div>
-                <div class="app-sub">إدارة الإيرادات، النسخ، وفودافون كاش</div>
+                <div class="app-title">ميجاستور & بروجيكت واي</div>
+                <div class="app-sub">إدارة التحصيلات، الاشتراكات والمصروفات</div>
             </div>
             <div class="header-actions">
+                <button class="icon-btn" onclick="openSettings()" title="الإعدادات وكلمة المرور">⚙️</button>
                 <button class="icon-btn" onclick="toggleTheme()" title="تغيير المظهر">🌓</button>
                 <button class="icon-btn" onclick="lockApp()" title="قفل التطبيق">🔒</button>
             </div>
@@ -362,39 +400,57 @@
                 <div class="summary-value text-inc" id="totalInc">0 ج.م</div>
             </div>
             <div class="summary-card">
-                <div class="summary-label">فودافون كاش</div>
-                <div class="summary-value text-vod" id="totalVod">0 ج.م</div>
+                <div class="summary-label">إجمالي المصروفات</div>
+                <div class="summary-value text-exp" id="totalExp">0 ج.م</div>
             </div>
             <div class="summary-card">
-                <div class="summary-label">إجمالي الإيراد</div>
+                <div class="summary-label">صافي الخزينة</div>
                 <div class="summary-value text-net" id="netBalance">0 ج.م</div>
             </div>
         </div>
 
         <!-- نموذج إضافة حركة جديدة -->
         <div class="form-card">
-            <div class="form-title">➕ تسجيل تحصيل نسخة جديدة</div>
+            <div class="form-title">➕ تسجيل معاملة مالية جديدة</div>
             <form id="transForm" onsubmit="addTransaction(event)">
                 <div class="input-group">
-                    <label>نوع التحصيل</label>
-                    <select id="type" class="input-field">
-                        <option value="cash">تحصيل نقدي (كاش)</option>
-                        <option value="vodafone">تحصيل فودافون كاش</option>
+                    <label>اختر البرنامج</label>
+                    <select id="program" class="input-field">
+                        <option value="MegaStore">ميجاستور (MegaStore)</option>
+                        <option value="ProjectY">بروجيكت واي (Project Y)</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>اسم النسخة / النظام</label>
-                    <input type="text" id="versionName" class="input-field" required placeholder="مثال: MegaStore POS v5">
+                    <label>نوع العملية</label>
+                    <select id="type" class="input-field" onchange="handleTypeChange()">
+                        <option value="inc">تحصيل إيراد / اشتراك (+)</option>
+                        <option value="exp">صرف مصروفات (-)</option>
+                    </select>
+                </div>
+                <div class="input-group" id="subTypeGroup">
+                    <label>نوع التحصيل / الاشتراك</label>
+                    <select id="subType" class="input-field">
+                        <option value="نسخة جديدة">تحصيل نسخة جديدة</option>
+                        <option value="دعم فني متعدد">اشتراك الدعم الفني المتعدد</option>
+                        <option value="نسخة احتياطية">اشتراك النسخة الاحتياطية</option>
+                        <option value="اشتراك أونلاين">اشتراك أونلاين</option>
+                        <option value="زيارة دعم فني">زيارة دعم فني</option>
+                        <option value="فودافون كاش">تحصيل عبر فودافون كاش</option>
+                    </select>
                 </div>
                 <div class="input-group">
+                    <label id="nameLabel">اسم النسخة / جهة الصرف</label>
+                    <input type="text" id="versionName" class="input-field" required placeholder="مثال: POS v5 / فاتورة صيانة">
+                </div>
+                <div class="input-group" id="addressGroup">
                     <label>عنوان / فرع العميل</label>
-                    <input type="text" id="clientAddress" class="input-field" required placeholder="مثال: الإسكندرية - سموحة">
+                    <input type="text" id="clientAddress" class="input-field" placeholder="مثال: الإسكندرية - سموحة">
                 </div>
                 <div class="input-group">
                     <label>المبلغ (ج.م)</label>
                     <input type="number" id="amount" class="input-field" step="0.01" required placeholder="0.00">
                 </div>
-                <button type="submit" class="submit-btn">حفظ وتحصيل النسخة</button>
+                <button type="submit" class="submit-btn">حفظ المعاملة المالية</button>
             </form>
         </div>
 
@@ -405,52 +461,53 @@
         </div>
 
         <!-- قائمة أحدث المعاملات -->
-        <div style="font-size: 11.5px; font-weight: 800; color: var(--brand-gold); margin-bottom: 6px;">سجل التحصيلات الأخيرة:</div>
+        <div style="font-size: 11.5px; font-weight: 800; color: var(--brand-gold); margin-bottom: 6px;">سجل الحركات الأخيرة:</div>
         <div class="transactions-section" id="transList">
             <!-- تُعبأ برمجياً -->
         </div>
 
         <footer class="footer-credit">
-            MegaStore Solutions | Secured by <span>Tapio</span>
+            MegaStore & Project Y | Secured by <span>Tapio</span>
         </footer>
     </div>
 
-    <!-- قالب مخفي يتم استخدامه لتصدير جدول PDF منظم واحترافي -->
+    <!-- قالب مخفي للـ PDF -->
     <div id="pdfReportContainer">
         <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px; color: #111;">
-            <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">ميجاستور | تقرير تحصينات النسخ والإيرادات</h2>
-            <p style="text-align: center; font-size: 12px; color: #666; margin-bottom: 20px;" id="reportDate">تاريخ التقرير: </p>
+            <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">تقرير التحصيلات والمصروفات المالي</h2>
+            <p style="text-align: center; font-size: 11px; color: #666; margin-bottom: 15px;" id="reportDate">تاريخ التقرير: </p>
             
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
                 <thead>
                     <tr style="background-color: #23400D; color: #fff;">
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">م</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">اسم النسخة</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">عنوان العميل</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">طريقة الدفع</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">المبلغ</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">التاريخ والوقت</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">م</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">البرنامج</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">النوع والتفاصيل</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">البيان / النسخة</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">العنوان</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">المبلغ</th>
+                        <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">التاريخ والوقت</th>
                     </tr>
                 </thead>
                 <tbody id="pdfTableBody">
                     <!-- تُعبأ برمجياً للطباعة -->
                 </tbody>
             </table>
-            <div style="font-weight: bold; font-size: 14px; text-align: left;" id="pdfTotalSum">
-                الإجمالي العام: 0 ج.م
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px;" id="pdfSummaryTotals">
+                <!-- إجماليات الـ PDF -->
             </div>
         </div>
     </div>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('megastore_transactions')) || [];
-        const correctPassword = '1234';
+        let transactions = JSON.parse(localStorage.getItem('combined_transactions')) || [];
+        let currentPassword = localStorage.getItem('app_password') || '1234';
 
         function verifyPassword() {
             const inputVal = document.getElementById('passInput').value;
             const errorEl = document.getElementById('errorMsg');
             
-            if(inputVal === correctPassword) {
+            if(inputVal === currentPassword) {
                 document.getElementById('lockScreen').style.display = 'none';
                 errorEl.style.display = 'none';
             } else {
@@ -468,24 +525,65 @@
             document.getElementById('lockScreen').style.display = 'flex';
         }
 
+        function openSettings() {
+            document.getElementById('newPassInput').value = '';
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function updatePassword() {
+            const newPass = document.getElementById('newPassInput').value;
+            if(newPass.trim() !== '') {
+                currentPassword = newPass;
+                localStorage.setItem('app_password', newPass);
+                alert('تم تغيير كلمة المرور بنجاح!');
+                closeSettings();
+            } else {
+                alert('الرجاء إدخال كلمة مرور صحيحة');
+            }
+        }
+
         function toggleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme');
             html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
+        function handleTypeChange() {
+            const type = document.getElementById('type').value;
+            const subTypeGroup = document.getElementById('subTypeGroup');
+            const addressGroup = document.getElementById('addressGroup');
+            const nameLabel = document.getElementById('nameLabel');
+
+            if(type === 'exp') {
+                subTypeGroup.style.display = 'none';
+                addressGroup.style.display = 'none';
+                nameLabel.innerText = 'بيان المصروف (سبب الصرف)';
+            } else {
+                subTypeGroup.style.display = 'block';
+                addressGroup.style.display = 'block';
+                nameLabel.innerText = 'اسم النسخة / جهة التحصيل';
+            }
+        }
+
         function addTransaction(e) {
             e.preventDefault();
+            const program = document.getElementById('program').value;
             const type = document.getElementById('type').value;
+            const subType = type === 'inc' ? document.getElementById('subType').value : 'مصروفات';
             const versionName = document.getElementById('versionName').value;
-            const clientAddress = document.getElementById('clientAddress').value;
+            const clientAddress = type === 'inc' ? document.getElementById('clientAddress').value : '-';
             const amount = parseFloat(document.getElementById('amount').value);
             const date = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            const newT = { id: Date.now(), type, versionName, clientAddress, amount, date };
+            const newT = { id: Date.now(), program, type, subType, versionName, clientAddress, amount, date };
             transactions.unshift(newT);
             saveAndRender();
             document.getElementById('transForm').reset();
+            handleTypeChange();
         }
 
         function deleteTransaction(id) {
@@ -496,38 +594,38 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('megastore_transactions', JSON.stringify(transactions));
+            localStorage.setItem('combined_transactions', JSON.stringify(transactions));
             renderUI();
         }
 
         function renderUI() {
-            let totalInc = 0, totalVod = 0;
+            let totalInc = 0, totalExp = 0;
             const listEl = document.getElementById('transList');
             const pdfBody = document.getElementById('pdfTableBody');
             listEl.innerHTML = '';
             pdfBody.innerHTML = '';
 
             if(transactions.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px; color:var(--text-muted); padding:15px;">لا توجد تحصيلات مسجلة حتى الآن</div>';
-                pdfBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">لا توجد بيانات</td></tr>';
+                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px; color:var(--text-muted); padding:15px;">لا توجد معاملات مسجلة حتى الآن</div>';
+                pdfBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">لا توجد بيانات</td></tr>';
             }
 
             transactions.forEach((t, index) => {
-                if(t.type === 'cash') totalInc += t.amount;
-                else totalVod += t.amount;
+                if(t.type === 'inc') totalInc += t.amount;
+                else totalExp += t.amount;
 
-                // عرض في التطبيق
+                // عرض التطبيق
                 const item = document.createElement('div');
                 item.className = 'transaction-item';
                 item.innerHTML = `
                     <div class="t-info">
-                        <h4>${t.versionName}</h4>
-                        <p>📍 ${t.clientAddress}</p>
-                        <span>🕒 ${t.date} | ${t.type === 'cash' ? 'نقدي (كاش)' : 'فودافون كاش'}</span>
+                        <h4>[${t.program}] ${t.versionName}</h4>
+                        <p>${t.type === 'inc' ? '🏷️ ' + t.subType + ' | 📍 ' + t.clientAddress : '💸 مصروفات نقدية'}</p>
+                        <span>🕒 ${t.date}</span>
                     </div>
                     <div style="display: flex; align-items: center;">
-                        <span class="t-amount" style="color: ${t.type === 'cash' ? 'var(--success)' : 'var(--vodafone)'};">
-                            ${t.amount.toLocaleString()} ج.م
+                        <span class="t-amount" style="color: ${t.type === 'inc' ? 'var(--success)' : 'var(--danger)'};">
+                            ${t.type === 'inc' ? '+' : '-'}${t.amount.toLocaleString()} ج.م
                         </span>
                         <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
                     </div>
@@ -537,21 +635,29 @@
                 // تجهيز صف الجدول للـ PDF
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td style="border: 1px solid #ddd; padding: 6px;">${index + 1}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px;">${t.versionName}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px;">${t.clientAddress}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px;">${t.type === 'cash' ? 'كاش' : 'فودافون كاش'}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px;">${t.amount.toLocaleString()} ج.م</td>
-                    <td style="border: 1px solid #ddd; padding: 6px;">${t.date}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px;">${index + 1}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px; font-weight:bold;">${t.program}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px;">${t.subType}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px;">${t.versionName}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px;">${t.clientAddress}</td>
+                    <td style="border: 1px solid #ddd; padding: 5px; color:${t.type==='inc'?'green':'red'};">${t.type==='inc'?'+':'-'}${t.amount.toLocaleString()} ج.م</td>
+                    <td style="border: 1px solid #ddd; padding: 5px;">${t.date}</td>
                 `;
                 pdfBody.appendChild(row);
             });
 
             document.getElementById('totalInc').innerText = totalInc.toLocaleString() + ' ج.م';
-            document.getElementById('totalVod').innerText = totalVod.toLocaleString() + ' ج.م';
-            const totalSum = totalInc + totalVod;
-            document.getElementById('netBalance').innerText = totalSum.toLocaleString() + ' ج.م';
-            document.getElementById('pdfTotalSum').innerText = `الإجمالي العام للتحصيلات: ${totalSum.toLocaleString()} ج.م`;
+            document.getElementById('totalExp').innerText = totalExp.toLocaleString() + ' ج.م';
+            const net = totalInc - totalExp;
+            const netEl = document.getElementById('netBalance');
+            netEl.innerText = net.toLocaleString() + ' ج.م';
+            netEl.className = `summary-value ${net >= 0 ? 'text-inc' : 'text-exp'}`;
+
+            document.getElementById('pdfSummaryTotals').innerHTML = `
+                <span>إجمالي الإيرادات: ${totalInc.toLocaleString()} ج.م</span>
+                <span>إجمالي المصروفات: ${totalExp.toLocaleString()} ج.م</span>
+                <span>الصافي: ${net.toLocaleString()} ج.م</span>
+            `;
             document.getElementById('reportDate').innerText = `تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`;
         }
 
@@ -564,18 +670,18 @@
 
         function exportPDF() {
             const element = document.getElementById('pdfReportContainer');
-            element.style.display = 'block'; // إظهار حاوية الجدول مؤقتاً للتصدير
+            element.style.display = 'block';
             
             const opt = {
                 margin:       10,
-                filename:     'MegaStore_Collection_Report.pdf',
+                filename:     'MegaStore_ProjectY_Report.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                element.style.display = 'none'; // إخفاءه مرة أخرى بعد الحفظ
+                element.style.display = 'none';
             });
         }
 
