@@ -93,7 +93,7 @@
                 <div class="stat-val" style="color: var(--vodafone);" id="cVod">0 ج.م</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">المصروفات</div>
+                <div class="stat-label">المصروفات (عامة)</div>
                 <div class="stat-val" style="color: var(--danger);" id="cExp">0 ج.م</div>
             </div>
             <div class="stat-card">
@@ -105,14 +105,14 @@
         <!-- نموذج سريع للتسجيل -->
         <form onsubmit="addTx(event)" style="background: var(--item-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--card-border);">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <div class="form-group">
+                <div class="form-group" id="branchBox">
                     <label>الفرع</label>
                     <select id="branch" class="input-field">
                         <option value="سيدي جابر">سيدي جابر</option>
                         <option value="كفر الدوار">كفر الدوار</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="progBox">
                     <label>البرنامج</label>
                     <select id="prog" class="input-field">
                         <option value="ميجاستور">ميجاستور</option>
@@ -123,7 +123,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                 <div class="form-group">
                     <label>نوع الحركة</label>
-                    <select id="type" class="input-field">
+                    <select id="type" class="input-field" onchange="onTypeChange()">
                         <option value="كاش">تحصيل كاش</option>
                         <option value="فودافون كاش">فودافون كاش</option>
                         <option value="مصروفات">مصروفات (-)</option>
@@ -135,7 +135,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>البيان أو اسم النسخة / العميل</label>
+                <label id="descLabel">البيان أو اسم النسخة / العميل</label>
                 <input type="text" id="desc" class="input-field" required placeholder="مثال: اشتراك دعم فني / نسخة جديدة">
             </div>
             <button type="submit" class="btn">حفظ الحركة فوراً</button>
@@ -143,7 +143,7 @@
 
         <!-- الأزرار السفلية -->
         <div class="actions">
-            <button class="action-btn" onclick="exportPDF()">📄 تصدير PDF</button>
+            <button class="action-btn" onclick="exportPDF()">📄 تصدير تقرير PDF احترافي</button>
             <button class="action-btn" onclick="clearAll()" style="color: var(--danger);">🗑️ مسح الكل</button>
         </div>
 
@@ -152,29 +152,57 @@
         <div class="list" id="txList"></div>
     </div>
 
-    <!-- قالب الـ PDF البسيط والمرتب -->
+    <!-- قالب الـ PDF الاحترافي والمنظم -->
     <div id="pdfReportContainer">
-        <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 15px; color: #111;">
-            <h3 style="text-align: center; color: #23400D; margin-bottom: 4px;">التقرير المالي السريع</h3>
-            <p style="font-size: 11px; color: #555; margin-bottom: 10px;">المحصل: <b>محمد أحمد</b> | التاريخ: <span id="pDate"></span></p>
-            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+        <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 25px; color: #111; background: #fff;">
+            <!-- ترويسة التقرير الرسمية -->
+            <div style="border-bottom: 3px solid #23400D; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="color: #23400D; margin: 0; font-size: 18px;">التقرير المالي للتحصيلات والمصروفات</h2>
+                    <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">ميجاستور & بروجيكت واي</p>
+                </div>
+                <div style="text-align: left; font-size: 11px; color: #555;">
+                    <div>المحصل: <b>محمد أحمد</b></div>
+                    <div id="pDate"></div>
+                </div>
+            </div>
+
+            <!-- جدول الإيرادات -->
+            <h4 style="color: #16a34a; font-size: 12px; margin-bottom: 6px;">أولاً: إيرادات التحصيلات (كاش وفودافون كاش)</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 15px;">
                 <thead>
                     <tr style="background: #23400D; color: #fff;">
-                        <th style="border: 1px solid #ddd; padding: 4px;">الفرع</th>
-                        <th style="border: 1px solid #ddd; padding: 4px;">البرنامج</th>
-                        <th style="border: 1px solid #ddd; padding: 4px;">النوع</th>
-                        <th style="border: 1px solid #ddd; padding: 4px;">البيان</th>
-                        <th style="border: 1px solid #ddd; padding: 4px;">المبلغ</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">الفرع</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">البرنامج</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">الطريقة</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">البيان / العميل</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">المبلغ</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">الوقت</th>
                     </tr>
                 </thead>
-                <tbody id="pBody"></tbody>
+                <tbody id="pBodyInc"></tbody>
             </table>
-            <div style="margin-top: 10px; font-weight: bold; font-size: 11px;" id="pSum"></div>
+
+            <!-- جدول المصروفات العامة -->
+            <h4 style="color: #dc2626; font-size: 12px; margin-bottom: 6px;">ثانياً: المصروفات العامة (مشتركة للفرعين)</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background: #7f1d1d; color: #fff;">
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">بيان المصروف</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">المبلغ المنصرف</th>
+                        <th style="border: 1px solid #ccc; padding: 6px; text-align: right;">الوقت</th>
+                    </tr>
+                </thead>
+                <tbody id="pBodyExp"></tbody>
+            </table>
+
+            <!-- ملخص الحسابات الختامي -->
+            <div style="background: #f4f4f4; border: 1px solid #ddd; padding: 10px; border-radius: 6px; font-size: 11px; font-weight: bold;" id="pSum"></div>
         </div>
     </div>
 
     <script>
-        let data = JSON.parse(localStorage.getItem('fast_fin_data')) || [];
+        let data = JSON.parse(localStorage.getItem('fast_fin_data_v2')) || [];
 
         function checkPass() {
             if(document.getElementById('passInput').value === '1234') {
@@ -184,25 +212,43 @@
             }
         }
 
+        function onTypeChange() {
+            const type = document.getElementById('type').value;
+            const branchBox = document.getElementById('branchBox');
+            const progBox = document.getElementById('progBox');
+            const descLabel = document.getElementById('descLabel');
+
+            if(type === 'مصروفات') {
+                branchBox.style.display = 'none';
+                progBox.style.display = 'none';
+                descLabel.innerText = 'بيان المصروف (عام للفرعين)';
+            } else {
+                branchBox.style.display = 'block';
+                progBox.style.display = 'block';
+                descLabel.innerText = 'البيان أو اسم النسخة / العميل';
+            }
+        }
+
         function addTx(e) {
             e.preventDefault();
-            const branch = document.getElementById('branch').value;
-            const prog = document.getElementById('prog').value;
             const type = document.getElementById('type').value;
+            const branch = type === 'مصروفات' ? 'عام (فرعين)' : document.getElementById('branch').value;
+            const prog = type === 'مصروفات' ? 'إدارة عامة' : document.getElementById('prog').value;
             const amt = parseFloat(document.getElementById('amt').value);
             const desc = document.getElementById('desc').value;
             const time = new Date().toLocaleDateString('ar-EG', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
 
             data.unshift({ id: Date.now(), branch, prog, type, amt, desc, time });
-            localStorage.setItem('fast_fin_data', JSON.stringify(data));
+            localStorage.setItem('fast_fin_data_v2', JSON.stringify(data));
             e.target.reset();
+            onTypeChange();
             render();
         }
 
         function delTx(id) {
             if(confirm('حذف هذه الحركة؟')) {
                 data = data.filter(x => x.id !== id);
-                localStorage.setItem('fast_fin_data', JSON.stringify(data));
+                localStorage.setItem('fast_fin_data_v2', JSON.stringify(data));
                 render();
             }
         }
@@ -210,7 +256,7 @@
         function clearAll() {
             if(confirm('مسح كل السجلات؟')) {
                 data = [];
-                localStorage.setItem('fast_fin_data', JSON.stringify(data));
+                localStorage.setItem('fast_fin_data_v2', JSON.stringify(data));
                 render();
             }
         }
@@ -218,12 +264,17 @@
         function render() {
             let cash = 0, vod = 0, exp = 0;
             const list = document.getElementById('txList');
-            const pBody = document.getElementById('pBody');
+            const pBodyInc = document.getElementById('pBodyInc');
+            const pBodyExp = document.getElementById('pBodyExp');
+            
             list.innerHTML = '';
-            pBody.innerHTML = '';
+            pBodyInc.innerHTML = '';
+            pBodyExp.innerHTML = '';
 
             if(data.length === 0) {
                 list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:10px;">لا توجد حركات مسجلة</div>';
+                pBodyInc.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:6px;">لا توجد إيرادات مسجلة</td></tr>';
+                pBodyExp.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:6px;">لا توجد مصروفات مسجلة</td></tr>';
             }
 
             data.forEach(x => {
@@ -231,12 +282,12 @@
                 else if(x.type === 'فودافون كاش') vod += x.amt;
                 else exp += x.amt;
 
-                // واجهة التطبيق
+                // عرض التطبيق
                 const div = document.createElement('div');
                 div.className = 'item';
                 div.innerHTML = `
                     <div>
-                        <b>[${x.branch}] ${x.desc}</b><br>
+                        <b>${x.type === 'مصروفات' ? '💸 [مصروف عام] ' : '[' + x.branch + '] '} ${x.desc}</b><br>
                         <span style="color:var(--text-muted);">${x.prog} - ${x.type} (${x.time})</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:6px;">
@@ -248,16 +299,27 @@
                 `;
                 list.appendChild(div);
 
-                // جدول الـ PDF
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="border: 1px solid #ddd; padding: 4px;">${x.branch}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px;">${x.prog}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px;">${x.type}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px;">${x.desc}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px; font-weight:bold;">${x.amt} ج.م</td>
-                `;
-                pBody.appendChild(tr);
+                // جداول الـ PDF المنفصلة
+                if(x.type !== 'مصروفات') {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.branch}</td>
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.prog}</td>
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.type}</td>
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.desc}</td>
+                        <td style="border: 1px solid #ddd; padding: 5px; font-weight:bold; color:green;">+${x.amt} ج.م</td>
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.time}</td>
+                    `;
+                    pBodyInc.appendChild(tr);
+                } else {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.desc}</td>
+                        <td style="border: 1px solid #ddd; padding: 5px; font-weight:bold; color:red;">-${x.amt} ج.م</td>
+                        <td style="border: 1px solid #ddd; padding: 5px;">${x.time}</td>
+                    `;
+                    pBodyExp.appendChild(tr);
+                }
             });
 
             document.getElementById('cCash').innerText = cash + ' ج.م';
@@ -266,14 +328,26 @@
             const net = (cash + vod) - exp;
             document.getElementById('cNet').innerText = net + ' ج.م';
 
-            document.getElementById('pSum').innerText = `إجمالي الكاش: ${cash} | فودافون: ${vod} | المصروفات: ${exp} | الصافي: ${net} ج.م`;
-            document.getElementById('pDate').innerText = new Date().toLocaleDateString('ar-EG');
+            document.getElementById('pSum').innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span>إجمالي التحصيلات الكاش: ${cash} ج.م</span>
+                    <span>إجمالي فودافون كاش: ${vod} ج.م</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:#dc2626; margin-bottom:4px;">
+                    <span>إجمالي المصروفات العامة: ${exp} ج.م</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:#23400D; border-top:1px solid #ccc; padding-top:4px; font-size:12px;">
+                    <span>صافي الخزينة النهائي:</span>
+                    <span>${net} ج.م</span>
+                </div>
+            `;
+            document.getElementById('pDate').innerText = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
         }
 
         function exportPDF() {
             const el = document.getElementById('pdfReportContainer');
             el.style.display = 'block';
-            html2pdf().from(el).set({ margin: 10, filename: 'Report_Muhammad_Ahmed.pdf', jsPDF: {format: 'a4'} }).save().then(() => {
+            html2pdf().from(el).set({ margin: 10, filename: 'Financial_Report_Muhammad_Ahmed.pdf', jsPDF: {format: 'a4'} }).save().then(() => {
                 el.style.display = 'none';
             });
         }
