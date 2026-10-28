@@ -138,7 +138,7 @@
             font-size: 14px;
         }
 
-        /* لوحة المؤشرات المالية (مقسمة بدقة) */
+        /* لوحة المؤشرات المالية */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -324,7 +324,7 @@
             display: none;
         }
 
-        /* نافذة إعدادات تغيير كلمة المرور */
+        /* نافذة الإعدادات */
         #settingsModal {
             position: absolute;
             inset: 0;
@@ -346,7 +346,7 @@
             text-align: center;
         }
 
-        /* تنسيق تقرير الـ PDF بفصل الإيرادات عن المصروفات */
+        /* تنسيق تقرير الـ PDF */
         #pdfReportContainer {
             display: none;
         }
@@ -362,7 +362,7 @@
             <div class="input-group" style="width: 100%;">
                 <input type="password" id="passInput" class="input-field" placeholder="كلمة المرور...">
             </div>
-            <div id="errorMsg" class="error-msg">كلمة المرور غير صحيحة!</div>
+            <div id="errorMsg" class="error-msg">كلمة المرور غير صحيحة! جرب 1234</div>
             <button class="submit-btn" onclick="verifyPassword()">دخول آمن</button>
         </div>
 
@@ -385,7 +385,7 @@
         <header class="app-header">
             <div>
                 <div class="app-title">ميجاستور & بروجيكت واي</div>
-                <div class="app-sub">المحصل: محمد أحمد علي</div>
+                <div class="app-sub">المحصل: محمد أحمد</div>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
@@ -394,7 +394,7 @@
             </div>
         </header>
 
-        <!-- لوحة الملخص المالي المنفصل -->
+        <!-- لوحة المؤشرات المالية -->
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="summary-label">تحصيلات كاش</div>
@@ -416,7 +416,7 @@
 
         <!-- نموذج الإدخال -->
         <div class="form-card">
-            <div class="form-title">➕ تسجيل معاملة جديدة (محمد أحمد علي)</div>
+            <div class="form-title">➕ تسجيل معاملة جديدة (محمد أحمد)</div>
             <form id="transForm" onsubmit="addTransaction(event)">
                 <div class="input-group">
                     <label>اختر الفرع</label>
@@ -480,16 +480,16 @@
         </div>
 
         <footer class="footer-credit">
-            المحصل: محمد أحمد  | Secured by <span>Tapio</span>
+            المحصل: محمد أحمد | Secured by <span>Tapio</span>
         </footer>
     </div>
 
-    <!-- قالب الـ PDF المنظم (جداول منفصلة للإيرادات والمصروفات) -->
+    <!-- قالب الـ PDF المنظم -->
     <div id="pdfReportContainer">
         <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px; color: #111;">
             <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">تقرير الحسابات المالي والتحصيلات</h2>
             <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 20px; border-bottom: 2px solid #23400D; padding-bottom: 8px;">
-                <span>المحصل المسؤول: <b>محمد أحمد </b></span>
+                <span>المحصل المسؤول: <b>محمد أحمد</b></span>
                 <span id="reportDate">تاريخ التقرير: </span>
             </div>
             
@@ -508,9 +508,7 @@
                         <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
                     </tr>
                 </thead>
-                <tbody id="pdfIncomeBody">
-                    <!-- تُعبأ برمجياً -->
-                </tbody>
+                <tbody id="pdfIncomeBody"></tbody>
             </table>
 
             <!-- جدول المصروفات -->
@@ -526,26 +524,28 @@
                         <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
                     </tr>
                 </thead>
-                <tbody id="pdfExpenseBody">
-                    <!-- تُعبأ برمجياً -->
-                </tbody>
+                <tbody id="pdfExpenseBody"></tbody>
             </table>
 
             <!-- الملخص النهائي للـ PDF -->
-            <div style="margin-top: 25px; border-top: 2px solid #23400D; padding-top: 10px; font-weight: bold; font-size: 12px; display: flex; flex-direction: column; gap: 4px;" id="pdfSummaryTotals">
-                <!-- الإجماليات -->
-            </div>
+            <div style="margin-top: 25px; border-top: 2px solid #23400D; padding-top: 10px; font-weight: bold; font-size: 12px; display: flex; flex-direction: column; gap: 4px;" id="pdfSummaryTotals"></div>
         </div>
     </div>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('muhammad_transactions')) || [];
-        let currentPassword = localStorage.getItem('app_password') || '1234';
+        let transactions = JSON.parse(localStorage.getItem('muhammad_ahmed_transactions')) || [];
+        
+        // ضبط كلمة المرور الافتتاحية والتأكد من حفظها
+        if(!localStorage.getItem('app_password')) {
+            localStorage.setItem('app_password', '1234');
+        }
 
         function verifyPassword() {
             const inputVal = document.getElementById('passInput').value;
             const errorEl = document.getElementById('errorMsg');
-            if(inputVal === currentPassword) {
+            const savedPass = localStorage.getItem('app_password') || '1234';
+
+            if(inputVal === savedPass) {
                 document.getElementById('lockScreen').style.display = 'none';
                 errorEl.style.display = 'none';
             } else {
@@ -575,7 +575,6 @@
         function updatePassword() {
             const newPass = document.getElementById('newPassInput').value;
             if(newPass.trim() !== '') {
-                currentPassword = newPass;
                 localStorage.setItem('app_password', newPass);
                 alert('تم تغيير كلمة المرور بنجاح!');
                 closeSettings();
@@ -633,7 +632,7 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('muhammad_transactions', JSON.stringify(transactions));
+            localStorage.setItem('muhammad_ahmed_transactions', JSON.stringify(transactions));
             renderUI();
         }
 
@@ -648,4 +647,112 @@
             pdfExpBody.innerHTML = '';
 
             if(transactions.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px;
+                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px; color:var(--text-muted); padding:15px;">لا توجد معاملات مسجلة حتى الآن</div>';
+                pdfIncBody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:8px;">لا توجد إيرادات</td></tr>';
+                pdfExpBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:8px;">لا توجد مصروفات</td></tr>';
+            }
+
+            let incCount = 0, expCount = 0;
+
+            transactions.forEach((t) => {
+                if(t.type === 'inc') {
+                    if(t.subType === 'فودافون كاش') totalVod += t.amount;
+                    else totalCash += t.amount;
+                } else {
+                    totalExp += t.amount;
+                }
+
+                // عرض التطبيق
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                item.innerHTML = `
+                    <div class="t-info">
+                        <h4>[${t.branch}] [${t.program}] ${t.versionName}</h4>
+                        <p>${t.type === 'inc' ? '🏷️ ' + t.subType + ' | 📍 ' + t.clientAddress : '💸 مصروفات'}</p>
+                        <span>🕒 ${t.date}</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="t-amount" style="color: ${t.type === 'inc' ? (t.subType==='فودافون كاش'?'var(--vodafone)':'var(--success)') : 'var(--danger)'};">
+                            ${t.type === 'inc' ? '+' : '-'}${t.amount.toLocaleString()} ج.م
+                        </span>
+                        <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+
+                // تجهيز جداول الـ PDF المنفصلة
+                if(t.type === 'inc') {
+                    incCount++;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="border: 1px solid #ddd; padding: 4px;">${incCount}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.branch}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.program}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.subType}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.versionName}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.clientAddress}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px; color:green; font-weight:bold;">+${t.amount.toLocaleString()} ج.م</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.date}</td>
+                    `;
+                    pdfIncBody.appendChild(row);
+                } else {
+                    expCount++;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="border: 1px solid #ddd; padding: 4px;">${expCount}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.branch}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.program}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.versionName}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px; color:red; font-weight:bold;">-${t.amount.toLocaleString()} ج.م</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${t.date}</td>
+                    `;
+                    pdfExpBody.appendChild(row);
+                }
+            });
+
+            document.getElementById('totalCash').innerText = totalCash.toLocaleString() + ' ج.م';
+            document.getElementById('totalVod').innerText = totalVod.toLocaleString() + ' ج.م';
+            document.getElementById('totalExp').innerText = totalExp.toLocaleString() + ' ج.م';
+            
+            const net = (totalCash + totalVod) - totalExp;
+            const netEl = document.getElementById('netBalance');
+            netEl.innerText = net.toLocaleString() + ' ج.م';
+            netEl.className = `summary-value ${net >= 0 ? 'text-inc' : 'text-exp'}`;
+
+            document.getElementById('pdfSummaryTotals').innerHTML = `
+                <div>إجمالي التحصيلات النقدية (كاش): ${totalCash.toLocaleString()} ج.م</div>
+                <div>إجمالي تحصيلات فودافون كاش: ${totalVod.toLocaleString()} ج.م</div>
+                <div>إجمالي المصروفات المنصرفة: ${totalExp.toLocaleString()} ج.م</div>
+                <div style="color: #23400D; margin-top: 4px; font-size:13px;">صافي الخزينة النهائي: ${net.toLocaleString()} ج.م</div>
+            `;
+            document.getElementById('reportDate').innerText = `تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`;
+        }
+
+        function clearData() {
+            if(confirm('تحذير: سيتم مسح كافة السجلات نهائياً! هل أنت متأكد؟')) {
+                transactions = [];
+                saveAndRender();
+            }
+        }
+
+        function exportPDF() {
+            const element = document.getElementById('pdfReportContainer');
+            element.style.display = 'block';
+            
+            const opt = {
+                margin:       10,
+                filename:     'Muhammad_Ahmed_Financial_Report.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                element.style.display = 'none';
+            });
+        }
+
+        renderUI();
+    </script>
+</body>
+</html>
