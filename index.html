@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ميجاستور & بروجيكت واي | النظام المالي المتقدم</title>
+    <title>ميجاستور & بروجيكت واي | السجل المالي السريع</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- مكتبة تصدير PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root[data-theme="dark"] {
@@ -13,746 +12,273 @@
             --card-surface: rgba(18, 26, 15, 0.95);
             --card-border: rgba(165, 170, 114, 0.25);
             --brand-gold: #D4AF37;
-            --brand-olive: #787C44;
             --text-main: #F7EFE6;
             --text-muted: #B8BFA0;
-            --item-bg: rgba(255, 255, 255, 0.04);
-            --item-border: rgba(255, 255, 255, 0.08);
+            --item-bg: rgba(255, 255, 255, 0.05);
             --success: #4ade80;
             --danger: #f87171;
             --vodafone: #e11d48;
-            --shadow-color: rgba(0, 0, 0, 0.8);
         }
-
         :root[data-theme="light"] {
             --bg-base: #EAE3D5;
             --card-surface: #F7EFE6;
             --card-border: rgba(120, 124, 68, 0.3);
             --brand-gold: #8B7322;
-            --brand-olive: #787C44;
             --text-main: #1A2611;
             --text-muted: #5E6652;
             --item-bg: #FFFFFF;
-            --item-border: rgba(35, 64, 13, 0.12);
             --success: #16a34a;
             --danger: #dc2626;
             --vodafone: #be123c;
-            --shadow-color: rgba(26, 38, 17, 0.15);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 540px;
-            background: var(--card-surface);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--card-border);
-            border-radius: 32px;
-            padding: 24px 18px;
-            box-shadow: 0 30px 80px var(--shadow-color);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* شاشة الأمان */
-        #lockScreen {
-            position: absolute;
-            inset: 0;
-            background: var(--card-surface);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .lock-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--brand-gold);
-            margin-bottom: 8px;
-        }
-
-        .lock-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        /* رأس التطبيق */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--item-border);
-            padding-bottom: 12px;
-        }
-
-        .app-title {
-            font-size: 17px;
-            font-weight: 900;
-            color: var(--brand-gold);
-        }
-
-        .app-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-btn {
-            background: var(--item-bg);
-            border: 1px solid var(--card-border);
-            color: var(--brand-gold);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* لوحة المؤشرات المالية */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .summary-card {
-            background: var(--item-bg);
-            border: 1px solid var(--item-border);
-            border-radius: 14px;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .summary-label {
-            font-size: 10.5px;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .summary-value {
-            font-size: 13.5px;
-            font-weight: 900;
-        }
-
-        .text-inc { color: var(--success); }
-        .text-vod { color: var(--vodafone); }
-        .text-exp { color: var(--danger); }
-        .text-net { color: var(--brand-gold); }
-
-        /* نموذج الإدخال */
-        .form-card {
-            background: var(--item-bg);
-            border: 1px solid var(--item-border);
-            border-radius: 20px;
-            padding: 14px;
-            margin-bottom: 16px;
-        }
-
-        .form-title {
-            font-size: 12.5px;
-            font-weight: 800;
-            color: var(--brand-gold);
-            margin-bottom: 10px;
-        }
-
-        .input-group {
-            margin-bottom: 8px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 10.5px;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 3px;
-        }
-
-        .input-field, select.input-field {
-            width: 100%;
-            background: var(--card-surface);
-            border: 1px solid var(--item-border);
-            color: var(--text-main);
-            padding: 9px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            outline: none;
-        }
-
-        .input-field:focus {
-            border-color: var(--brand-gold);
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--brand-gold) 0%, #b8972d 100%);
-            color: #070B05;
-            border: none;
-            padding: 11px;
-            border-radius: 10px;
-            font-weight: 900;
-            font-size: 13.5px;
-            cursor: pointer;
-            margin-top: 4px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-        }
-
-        .action-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .action-btn-custom {
-            flex: 1;
-            background: var(--item-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 9px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.2s;
-        }
-
-        .action-btn-custom:hover {
-            border-color: var(--brand-gold);
-            color: var(--brand-gold);
-        }
-
-        /* قائمة المعاملات */
-        .transactions-section {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-
-        .transaction-item {
-            background: var(--item-bg);
-            border: 1px solid var(--item-border);
-            border-radius: 10px;
-            padding: 9px 11px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .t-info h4 {
-            font-size: 12px;
-            font-weight: 800;
-            margin-bottom: 2px;
-        }
-
-        .t-info p {
-            font-size: 11px;
-            color: var(--brand-olive);
-            font-weight: 700;
-        }
-
-        .t-info span {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .t-amount {
-            font-size: 13px;
-            font-weight: 900;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 13px;
-            margin-right: 6px;
-        }
-
-        .footer-credit {
-            text-align: center;
-            font-size: 10.5px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--item-border);
-            padding-top: 10px;
-        }
-
-        .footer-credit span {
-            color: var(--brand-gold);
-            font-weight: 900;
-        }
-
-        .error-msg {
-            color: var(--danger);
-            font-size: 11.5px;
-            margin-top: 6px;
-            font-weight: 700;
-            display: none;
-        }
-
-        /* نافذة الإعدادات */
-        #settingsModal {
-            position: absolute;
-            inset: 0;
-            background: rgba(7, 11, 5, 0.9);
-            z-index: 90;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background: var(--card-surface);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 20px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-        }
-
-        /* تنسيق تقرير الـ PDF */
-        #pdfReportContainer {
-            display: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
+        .container { width: 100%; max-width: 480px; background: var(--card-surface); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; }
+        
+        #lockScreen { position: absolute; inset: 0; background: var(--card-surface); z-index: 100; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+        .title { font-size: 16px; font-weight: 900; color: var(--brand-gold); }
+        .subtitle { font-size: 11px; color: var(--text-muted); }
+        
+        .summary-box { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; }
+        .stat-card { background: var(--item-bg); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--card-border); }
+        .stat-label { font-size: 10px; color: var(--text-muted); }
+        .stat-val { font-size: 13px; font-weight: 900; margin-top: 2px; }
+        
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+        .input-field { width: 100%; background: var(--bg-base); border: 1px solid var(--card-border); color: var(--text-main); padding: 8px 10px; border-radius: 8px; font-size: 12px; outline: none; }
+        
+        .btn { width: 100%; background: var(--brand-gold); color: #070B05; border: none; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 5px; }
+        
+        .list { max-height: 180px; overflow-y: auto; margin-top: 10px; }
+        .item { background: var(--item-bg); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px; border: 1px solid var(--card-border); }
+        .del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 12px; padding: 0 4px; }
+        
+        .actions { display: flex; gap: 8px; margin-top: 10px; }
+        .action-btn { flex: 1; background: var(--item-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; }
+        
+        #pdfReportContainer { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- شاشة الأمان -->
+    <div class="container" id="appContent">
+        <!-- شاشة الحماية -->
         <div id="lockScreen">
-            <div class="lock-title">🔐 النظام المالي المتقدم</div>
-            <div class="lock-desc">أدخل كلمة المرور (الافتراضية: 1234)</div>
-            <div class="input-group" style="width: 100%;">
-                <input type="password" id="passInput" class="input-field" placeholder="كلمة المرور...">
-            </div>
-            <div id="errorMsg" class="error-msg">كلمة المرور غير صحيحة! جرب 1234</div>
-            <button class="submit-btn" onclick="verifyPassword()">دخول آمن</button>
+            <h3 style="color: var(--brand-gold); margin-bottom: 5px;">🔐 تسجيل الدخول</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">كلمة المرور الافتراضية: 1234</p>
+            <input type="password" id="passInput" class="input-field" placeholder="أدخل كلمة المرور..." style="margin-bottom: 10px; text-align: center;">
+            <button class="btn" onclick="checkPass()">دخول</button>
         </div>
 
-        <!-- نافذة الإعدادات -->
-        <div id="settingsModal">
-            <div class="modal-card">
-                <div class="form-title" style="margin-bottom: 12px;">⚙️ تغيير كلمة المرور</div>
-                <div class="input-group">
-                    <label>كلمة المرور الجديدة</label>
-                    <input type="password" id="newPassInput" class="input-field" placeholder="الباسورد الجديد...">
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 12px;">
-                    <button class="submit-btn" onclick="updatePassword()">حفظ</button>
-                    <button class="action-btn-custom" onclick="closeSettings()" style="margin-top: 4px;">إلغاء</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- رأس التطبيق -->
-        <header class="app-header">
+        <!-- رأس الصفحة -->
+        <div class="header">
             <div>
-                <div class="app-title">ميجاستور & بروجيكت واي</div>
-                <div class="app-sub">المحصل: محمد أحمد</div>
+                <div class="title">النظام المالي السريع</div>
+                <div class="subtitle">المحصل: محمد أحمد</div>
             </div>
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
-                <button class="icon-btn" onclick="toggleTheme()" title="المظهر">🌓</button>
-                <button class="icon-btn" onclick="lockApp()" title="قفل">🔒</button>
-            </div>
-        </header>
+            <button onclick="document.getElementById('lockScreen').style.display='flex'" style="background:none; border:none; color:var(--brand-gold); cursor:pointer;">🔒</button>
+        </div>
 
-        <!-- لوحة المؤشرات المالية -->
-        <div class="summary-grid">
-            <div class="summary-card">
-                <div class="summary-label">تحصيلات كاش</div>
-                <div class="summary-value text-inc" id="totalCash">0 ج.م</div>
+        <!-- الملخص السريع -->
+        <div class="summary-box">
+            <div class="stat-card">
+                <div class="stat-label">تحصيلات كاش</div>
+                <div class="stat-val" style="color: var(--success);" id="cCash">0 ج.م</div>
             </div>
-            <div class="summary-card">
-                <div class="summary-label">فودافون كاش</div>
-                <div class="summary-value text-vod" id="totalVod">0 ج.م</div>
+            <div class="stat-card">
+                <div class="stat-label">فودافون كاش</div>
+                <div class="stat-val" style="color: var(--vodafone);" id="cVod">0 ج.م</div>
             </div>
-            <div class="summary-card">
-                <div class="summary-label">إجمالي المصروفات</div>
-                <div class="summary-value text-exp" id="totalExp">0 ج.م</div>
+            <div class="stat-card">
+                <div class="stat-label">المصروفات</div>
+                <div class="stat-val" style="color: var(--danger);" id="cExp">0 ج.م</div>
             </div>
-            <div class="summary-card">
-                <div class="summary-label">صافي الخزينة العام</div>
-                <div class="summary-value text-net" id="netBalance">0 ج.م</div>
+            <div class="stat-card">
+                <div class="stat-label">الصافي بالخزينة</div>
+                <div class="stat-val" style="color: var(--brand-gold);" id="cNet">0 ج.م</div>
             </div>
         </div>
 
-        <!-- نموذج الإدخال -->
-        <div class="form-card">
-            <div class="form-title">➕ تسجيل معاملة جديدة (محمد أحمد)</div>
-            <form id="transForm" onsubmit="addTransaction(event)">
-                <div class="input-group">
-                    <label>اختر الفرع</label>
+        <!-- نموذج سريع للتسجيل -->
+        <form onsubmit="addTx(event)" style="background: var(--item-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--card-border);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div class="form-group">
+                    <label>الفرع</label>
                     <select id="branch" class="input-field">
-                        <option value="فرع سيدي جابر">فرع سيدي جابر</option>
-                        <option value="فرع كفر الدوار">فرع كفر الدوار</option>
+                        <option value="سيدي جابر">سيدي جابر</option>
+                        <option value="كفر الدوار">كفر الدوار</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>اختر البرنامج</label>
-                    <select id="program" class="input-field">
-                        <option value="MegaStore">ميجاستور (MegaStore)</option>
-                        <option value="ProjectY">بروجيكت واي (Project Y)</option>
+                <div class="form-group">
+                    <label>البرنامج</label>
+                    <select id="prog" class="input-field">
+                        <option value="ميجاستور">ميجاستور</option>
+                        <option value="بروجيكت واي">بروجيكت واي</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>نوع العملية</label>
-                    <select id="type" class="input-field" onchange="handleTypeChange()">
-                        <option value="inc">تحصيل إيراد / اشتراك (+)</option>
-                        <option value="exp">صرف مصروفات (-)</option>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div class="form-group">
+                    <label>نوع الحركة</label>
+                    <select id="type" class="input-field">
+                        <option value="كاش">تحصيل كاش</option>
+                        <option value="فودافون كاش">فودافون كاش</option>
+                        <option value="مصروفات">مصروفات (-)</option>
                     </select>
                 </div>
-                <div class="input-group" id="subTypeGroup">
-                    <label>طريقة التحصيل / نوع الاشتراك</label>
-                    <select id="subType" class="input-field">
-                        <option value="تحصيل نقدي (كاش)">تحصيل نقدي (كاش)</option>
-                        <option value="فودافون كاش">تحصيل فودافون كاش</option>
-                        <option value="تحصيل نسخة جديدة">تحصيل نسخة جديدة</option>
-                        <option value="دعم فني متعدد">اشتراك الدعم الفني المتعدد</option>
-                        <option value="نسخة احتياطية">اشتراك النسخة الاحتياطية</option>
-                        <option value="اشتراك أونلاين">اشتراك أونلاين</option>
-                        <option value="زيارة دعم فني">زيارة دعم فني</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label id="nameLabel">اسم النسخة / جهة التحصيل</label>
-                    <input type="text" id="versionName" class="input-field" required placeholder="مثال: POS v5 / فاتورة صيانة">
-                </div>
-                <div class="input-group" id="addressGroup">
-                    <label>عنوان / فرع العميل</label>
-                    <input type="text" id="clientAddress" class="input-field" placeholder="مثال: سموحة - شارع الإقبال">
-                </div>
-                <div class="input-group">
+                <div class="form-group">
                     <label>المبلغ (ج.م)</label>
-                    <input type="number" id="amount" class="input-field" step="0.01" required placeholder="0.00">
+                    <input type="number" id="amt" class="input-field" step="0.01" required placeholder="0.00">
                 </div>
-                <button type="submit" class="submit-btn">حفظ المعاملة</button>
-            </form>
-        </div>
+            </div>
+            <div class="form-group">
+                <label>البيان أو اسم النسخة / العميل</label>
+                <input type="text" id="desc" class="input-field" required placeholder="مثال: اشتراك دعم فني / نسخة جديدة">
+            </div>
+            <button type="submit" class="btn">حفظ الحركة فوراً</button>
+        </form>
 
-        <!-- أزرار التقارير والتصدير -->
-        <div class="action-row">
-            <button class="action-btn-custom" onclick="exportPDF()">📄 تصدير تقرير PDF منظم</button>
-            <button class="action-btn-custom" onclick="clearData()" style="color: var(--danger);">🗑️ مسح الكل</button>
+        <!-- الأزرار السفلية -->
+        <div class="actions">
+            <button class="action-btn" onclick="exportPDF()">📄 تصدير PDF</button>
+            <button class="action-btn" onclick="clearAll()" style="color: var(--danger);">🗑️ مسح الكل</button>
         </div>
 
         <!-- قائمة الحركات -->
-        <div style="font-size: 11.5px; font-weight: 800; color: var(--brand-gold); margin-bottom: 6px;">سجل الحركات الأخيرة:</div>
-        <div class="transactions-section" id="transList">
-            <!-- تُعبأ برمجياً -->
-        </div>
-
-        <footer class="footer-credit">
-            المحصل: محمد أحمد | Secured by <span>Tapio</span>
-        </footer>
+        <div style="font-size: 11px; font-weight: 800; color: var(--brand-gold); margin-top: 10px; margin-bottom: 4px;">آخر الحركات المسجلة:</div>
+        <div class="list" id="txList"></div>
     </div>
 
-    <!-- قالب الـ PDF المنظم -->
+    <!-- قالب الـ PDF البسيط والمرتب -->
     <div id="pdfReportContainer">
-        <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px; color: #111;">
-            <h2 style="text-align: center; color: #23400D; margin-bottom: 5px;">تقرير الحسابات المالي والتحصيلات</h2>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 20px; border-bottom: 2px solid #23400D; padding-bottom: 8px;">
-                <span>المحصل المسؤول: <b>محمد أحمد</b></span>
-                <span id="reportDate">تاريخ التقرير: </span>
-            </div>
-            
-            <!-- جدول الإيرادات والتحصيلات -->
-            <h3 style="color: #16a34a; font-size: 14px; margin-bottom: 6px;">أولاً: الإيرادات وتحصيلات الاشتراكات</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
+        <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 15px; color: #111;">
+            <h3 style="text-align: center; color: #23400D; margin-bottom: 4px;">التقرير المالي السريع</h3>
+            <p style="font-size: 11px; color: #555; margin-bottom: 10px;">المحصل: <b>محمد أحمد</b> | التاريخ: <span id="pDate"></span></p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
                 <thead>
-                    <tr style="background-color: #23400D; color: #fff;">
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">م</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الفرع</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">البرنامج</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الطريقة / البند</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">النسخة / البيان</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">العنوان</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">المبلغ</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
+                    <tr style="background: #23400D; color: #fff;">
+                        <th style="border: 1px solid #ddd; padding: 4px;">الفرع</th>
+                        <th style="border: 1px solid #ddd; padding: 4px;">البرنامج</th>
+                        <th style="border: 1px solid #ddd; padding: 4px;">النوع</th>
+                        <th style="border: 1px solid #ddd; padding: 4px;">البيان</th>
+                        <th style="border: 1px solid #ddd; padding: 4px;">المبلغ</th>
                     </tr>
                 </thead>
-                <tbody id="pdfIncomeBody"></tbody>
+                <tbody id="pBody"></tbody>
             </table>
-
-            <!-- جدول المصروفات -->
-            <h3 style="color: #dc2626; font-size: 14px; margin-bottom: 6px; margin-top: 20px;">ثانياً: المصروفات المنصرفة</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
-                <thead>
-                    <tr style="background-color: #7f1d1d; color: #fff;">
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">م</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">الفرع</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">البرنامج</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">بيان المصروف</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">المبلغ</th>
-                        <th style="border: 1px solid #ddd; padding: 5px; text-align: right;">التاريخ والوقت</th>
-                    </tr>
-                </thead>
-                <tbody id="pdfExpenseBody"></tbody>
-            </table>
-
-            <!-- الملخص النهائي للـ PDF -->
-            <div style="margin-top: 25px; border-top: 2px solid #23400D; padding-top: 10px; font-weight: bold; font-size: 12px; display: flex; flex-direction: column; gap: 4px;" id="pdfSummaryTotals"></div>
+            <div style="margin-top: 10px; font-weight: bold; font-size: 11px;" id="pSum"></div>
         </div>
     </div>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('muhammad_ahmed_transactions')) || [];
-        
-        // ضبط كلمة المرور الافتتاحية والتأكد من حفظها
-        if(!localStorage.getItem('app_password')) {
-            localStorage.setItem('app_password', '1234');
-        }
+        let data = JSON.parse(localStorage.getItem('fast_fin_data')) || [];
 
-        function verifyPassword() {
-            const inputVal = document.getElementById('passInput').value;
-            const errorEl = document.getElementById('errorMsg');
-            const savedPass = localStorage.getItem('app_password') || '1234';
-
-            if(inputVal === savedPass) {
+        function checkPass() {
+            if(document.getElementById('passInput').value === '1234') {
                 document.getElementById('lockScreen').style.display = 'none';
-                errorEl.style.display = 'none';
             } else {
-                errorEl.style.display = 'block';
+                alert('كلمة المرور خطأ (جرب 1234)');
             }
         }
 
-        document.getElementById('passInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') verifyPassword();
-        });
-
-        function lockApp() {
-            document.getElementById('passInput').value = '';
-            document.getElementById('errorMsg').style.display = 'none';
-            document.getElementById('lockScreen').style.display = 'flex';
-        }
-
-        function openSettings() {
-            document.getElementById('newPassInput').value = '';
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
-        function updatePassword() {
-            const newPass = document.getElementById('newPassInput').value;
-            if(newPass.trim() !== '') {
-                localStorage.setItem('app_password', newPass);
-                alert('تم تغيير كلمة المرور بنجاح!');
-                closeSettings();
-            } else {
-                alert('الرجاء إدخال كلمة مرور صحيحة');
-            }
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-        }
-
-        function handleTypeChange() {
-            const type = document.getElementById('type').value;
-            const subTypeGroup = document.getElementById('subTypeGroup');
-            const addressGroup = document.getElementById('addressGroup');
-            const nameLabel = document.getElementById('nameLabel');
-
-            if(type === 'exp') {
-                subTypeGroup.style.display = 'none';
-                addressGroup.style.display = 'none';
-                nameLabel.innerText = 'بيان المصروف (سبب الصرف)';
-            } else {
-                subTypeGroup.style.display = 'block';
-                addressGroup.style.display = 'block';
-                nameLabel.innerText = 'اسم النسخة / جهة التحصيل';
-            }
-        }
-
-        function addTransaction(e) {
+        function addTx(e) {
             e.preventDefault();
             const branch = document.getElementById('branch').value;
-            const program = document.getElementById('program').value;
+            const prog = document.getElementById('prog').value;
             const type = document.getElementById('type').value;
-            const subType = type === 'inc' ? document.getElementById('subType').value : 'مصروفات';
-            const versionName = document.getElementById('versionName').value;
-            const clientAddress = type === 'inc' ? document.getElementById('clientAddress').value : '-';
-            const amount = parseFloat(document.getElementById('amount').value);
-            const date = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const amt = parseFloat(document.getElementById('amt').value);
+            const desc = document.getElementById('desc').value;
+            const time = new Date().toLocaleDateString('ar-EG', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
 
-            const newT = { id: Date.now(), branch, program, type, subType, versionName, clientAddress, amount, date };
-            transactions.unshift(newT);
-            saveAndRender();
-            document.getElementById('transForm').reset();
-            handleTypeChange();
+            data.unshift({ id: Date.now(), branch, prog, type, amt, desc, time });
+            localStorage.setItem('fast_fin_data', JSON.stringify(data));
+            e.target.reset();
+            render();
         }
 
-        function deleteTransaction(id) {
-            if(confirm('هل أنت متأكد من حذف هذه الحركة؟')) {
-                transactions = transactions.filter(t => t.id !== id);
-                saveAndRender();
+        function delTx(id) {
+            if(confirm('حذف هذه الحركة؟')) {
+                data = data.filter(x => x.id !== id);
+                localStorage.setItem('fast_fin_data', JSON.stringify(data));
+                render();
             }
         }
 
-        function saveAndRender() {
-            localStorage.setItem('muhammad_ahmed_transactions', JSON.stringify(transactions));
-            renderUI();
+        function clearAll() {
+            if(confirm('مسح كل السجلات؟')) {
+                data = [];
+                localStorage.setItem('fast_fin_data', JSON.stringify(data));
+                render();
+            }
         }
 
-        function renderUI() {
-            let totalCash = 0, totalVod = 0, totalExp = 0;
-            const listEl = document.getElementById('transList');
-            const pdfIncBody = document.getElementById('pdfIncomeBody');
-            const pdfExpBody = document.getElementById('pdfExpenseBody');
-            
-            listEl.innerHTML = '';
-            pdfIncBody.innerHTML = '';
-            pdfExpBody.innerHTML = '';
+        function render() {
+            let cash = 0, vod = 0, exp = 0;
+            const list = document.getElementById('txList');
+            const pBody = document.getElementById('pBody');
+            list.innerHTML = '';
+            pBody.innerHTML = '';
 
-            if(transactions.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; font-size:11.5px; color:var(--text-muted); padding:15px;">لا توجد معاملات مسجلة حتى الآن</div>';
-                pdfIncBody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:8px;">لا توجد إيرادات</td></tr>';
-                pdfExpBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:8px;">لا توجد مصروفات</td></tr>';
+            if(data.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:10px;">لا توجد حركات مسجلة</div>';
             }
 
-            let incCount = 0, expCount = 0;
+            data.forEach(x => {
+                if(x.type === 'كاش') cash += x.amt;
+                else if(x.type === 'فودافون كاش') vod += x.amt;
+                else exp += x.amt;
 
-            transactions.forEach((t) => {
-                if(t.type === 'inc') {
-                    if(t.subType === 'فودافون كاش') totalVod += t.amount;
-                    else totalCash += t.amount;
-                } else {
-                    totalExp += t.amount;
-                }
-
-                // عرض التطبيق
-                const item = document.createElement('div');
-                item.className = 'transaction-item';
-                item.innerHTML = `
-                    <div class="t-info">
-                        <h4>[${t.branch}] [${t.program}] ${t.versionName}</h4>
-                        <p>${t.type === 'inc' ? '🏷️ ' + t.subType + ' | 📍 ' + t.clientAddress : '💸 مصروفات'}</p>
-                        <span>🕒 ${t.date}</span>
+                // واجهة التطبيق
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                    <div>
+                        <b>[${x.branch}] ${x.desc}</b><br>
+                        <span style="color:var(--text-muted);">${x.prog} - ${x.type} (${x.time})</span>
                     </div>
-                    <div style="display: flex; align-items: center;">
-                        <span class="t-amount" style="color: ${t.type === 'inc' ? (t.subType==='فودافون كاش'?'var(--vodafone)':'var(--success)') : 'var(--danger)'};">
-                            ${t.type === 'inc' ? '+' : '-'}${t.amount.toLocaleString()} ج.م
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-weight:900; color:${x.type==='مصروفات'?'var(--danger)':(x.type==='فودافون كاش'?'var(--vodafone)':'var(--success)')};">
+                            ${x.type==='مصروفات'?'-':'+'}${x.amt} ج.م
                         </span>
-                        <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
+                        <button class="del" onclick="delTx(${x.id})">✕</button>
                     </div>
                 `;
-                listEl.appendChild(item);
+                list.appendChild(div);
 
-                // تجهيز جداول الـ PDF المنفصلة
-                if(t.type === 'inc') {
-                    incCount++;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="border: 1px solid #ddd; padding: 4px;">${incCount}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.branch}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.program}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.subType}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.versionName}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.clientAddress}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px; color:green; font-weight:bold;">+${t.amount.toLocaleString()} ج.م</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.date}</td>
-                    `;
-                    pdfIncBody.appendChild(row);
-                } else {
-                    expCount++;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="border: 1px solid #ddd; padding: 4px;">${expCount}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.branch}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.program}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.versionName}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px; color:red; font-weight:bold;">-${t.amount.toLocaleString()} ج.م</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${t.date}</td>
-                    `;
-                    pdfExpBody.appendChild(row);
-                }
+                // جدول الـ PDF
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="border: 1px solid #ddd; padding: 4px;">${x.branch}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px;">${x.prog}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px;">${x.type}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px;">${x.desc}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px; font-weight:bold;">${x.amt} ج.م</td>
+                `;
+                pBody.appendChild(tr);
             });
 
-            document.getElementById('totalCash').innerText = totalCash.toLocaleString() + ' ج.م';
-            document.getElementById('totalVod').innerText = totalVod.toLocaleString() + ' ج.م';
-            document.getElementById('totalExp').innerText = totalExp.toLocaleString() + ' ج.م';
-            
-            const net = (totalCash + totalVod) - totalExp;
-            const netEl = document.getElementById('netBalance');
-            netEl.innerText = net.toLocaleString() + ' ج.م';
-            netEl.className = `summary-value ${net >= 0 ? 'text-inc' : 'text-exp'}`;
+            document.getElementById('cCash').innerText = cash + ' ج.م';
+            document.getElementById('cVod').innerText = vod + ' ج.م';
+            document.getElementById('cExp').innerText = exp + ' ج.م';
+            const net = (cash + vod) - exp;
+            document.getElementById('cNet').innerText = net + ' ج.م';
 
-            document.getElementById('pdfSummaryTotals').innerHTML = `
-                <div>إجمالي التحصيلات النقدية (كاش): ${totalCash.toLocaleString()} ج.م</div>
-                <div>إجمالي تحصيلات فودافون كاش: ${totalVod.toLocaleString()} ج.م</div>
-                <div>إجمالي المصروفات المنصرفة: ${totalExp.toLocaleString()} ج.م</div>
-                <div style="color: #23400D; margin-top: 4px; font-size:13px;">صافي الخزينة النهائي: ${net.toLocaleString()} ج.م</div>
-            `;
-            document.getElementById('reportDate').innerText = `تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`;
-        }
-
-        function clearData() {
-            if(confirm('تحذير: سيتم مسح كافة السجلات نهائياً! هل أنت متأكد؟')) {
-                transactions = [];
-                saveAndRender();
-            }
+            document.getElementById('pSum').innerText = `إجمالي الكاش: ${cash} | فودافون: ${vod} | المصروفات: ${exp} | الصافي: ${net} ج.م`;
+            document.getElementById('pDate').innerText = new Date().toLocaleDateString('ar-EG');
         }
 
         function exportPDF() {
-            const element = document.getElementById('pdfReportContainer');
-            element.style.display = 'block';
-            
-            const opt = {
-                margin:       10,
-                filename:     'Muhammad_Ahmed_Financial_Report.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().from(element).set(opt).save().then(() => {
-                element.style.display = 'none';
+            const el = document.getElementById('pdfReportContainer');
+            el.style.display = 'block';
+            html2pdf().from(el).set({ margin: 10, filename: 'Report_Muhammad_Ahmed.pdf', jsPDF: {format: 'a4'} }).save().then(() => {
+                el.style.display = 'none';
             });
         }
 
-        renderUI();
+        render();
     </script>
 </body>
 </html>
